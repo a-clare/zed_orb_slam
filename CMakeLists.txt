@@ -5,4 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(Pangolin)
 
+add_subdirectory(ORB_SLAM3/Thirdparty/DBoW2)
+
 add_executable(zed_orb_slam main.cpp)
