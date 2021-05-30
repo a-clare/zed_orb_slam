@@ -1,0 +1,74 @@
+  %YAML:1.0
+
+  #--------------------------------------------------------------------------------------------
+  # Camera Parameters. Adjust them!
+  #--------------------------------------------------------------------------------------------
+  Camera.type: "KannalaBrandt8"
+
+  # Left Camera calibration and distortion parameters taken from /usr/local/zed/settings
+  Camera.fx: 1058.83
+  Camera.fy: 1057.84
+  Camera.cx: 1130.37
+  Camera.cy: 627.34
+  # ZED Does not provide a k4 parameter so set to 0
+  Camera.k1: -0.0409334
+  Camera.k2: 0.00991803
+  Camera.k3: -0.00498366
+  Camera.k4: 0.0
+
+  Camera2.fx: 1055.43
+  Camera2.fy: 1054.73
+  Camera2.cx: 1134.33
+  Camera2.cy: 624.464
+
+  Camera2.k1: -0.0412754
+  Camera2.k2: 0.00980042
+  Camera2.k3: -0.00480904
+  Camera2.k4: 0.0
+
+  # Camera resolution
+  Camera.width: 2208
+  Camera.height: 1242
+
+  # Camera frames per second, ZED2 in 2K mode does 15fps
+  Camera.fps: 15.0
+
+  # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+  Camera.RGB: 1
+
+  Camera.bf: 119.836
+
+  #--------------------------------------------------------------------------------------------
+  # ORB Parameters
+  #--------------------------------------------------------------------------------------------
+
+  # ORB Extractor: Number of features per image
+  ORBextractor.nFeatures: 1000
+
+  # ORB Extractor: Scale factor between levels in the scale pyramid
+  ORBextractor.scaleFactor: 1.2
+
+  # ORB Extractor: Number of levels in the scale pyramid
+  ORBextractor.nLevels: 8
+
+
+  # ORB Extractor: Fast threshold
+  # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+  # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+  # You can lower these values if your images have low contrast
+  ORBextractor.iniThFAST: 20
+  ORBextractor.minThFAST: 7
+
+  #--------------------------------------------------------------------------------------------
+  # Viewer Parameters
+  #--------------------------------------------------------------------------------------------
+  Viewer.KeyFrameSize: 0.05
+  Viewer.KeyFrameLineWidth: 1
+  Viewer.GraphLineWidth: 1
+    Viewer.PointSize:2
+  Viewer.CameraSize: 0.05
+  Viewer.CameraLineWidth: 2
+  Viewer.ViewpointX: 0
+  Viewer.ViewpointY: -10
+  Viewer.ViewpointZ: -0.1
+  Viewer.ViewpointF: 2000
