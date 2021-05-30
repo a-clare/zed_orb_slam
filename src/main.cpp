@@ -74,7 +74,8 @@ int main(int argc, char **argv) {
         "\tFPS: " << camera_infos.camera_configuration.fps << std::endl;
 
     std::cout << "argc: " << argc << std::endl;
-
+    std::cout << "argv[2]: " << argv[2] << std::endl;
+    std::cout << "argv[3]: " << argv[3] << std::endl;
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     // vocab should be arg[2] and settings argv[3], this is different than standard ORB SLAM
     ORB_SLAM3::System SLAM(argv[2],argv[3],ORB_SLAM3::System::STEREO,true);
