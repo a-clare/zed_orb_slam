@@ -31,7 +31,7 @@
 
 #include <opencv2/opencv.hpp>
 
-#include<System.h>
+#include <System.h>
 
 // Using std and sl namespaces
 using namespace std;
@@ -42,11 +42,20 @@ void parse_args(int argc, char **argv,InitParameters& param);
 void print(std::string msg_prefix, sl::ERROR_CODE err_code = sl::ERROR_CODE::SUCCESS, std::string msg_suffix = "");
 
 int main(int argc, char **argv) {
+
+    if (argc < 4) {
+        std::cout << "Not enough input arguments" << std::endl;
+        std::cout << "Usage: " << std::endl;
+        std::cout << "\tzed_orb_slam /path/to/svo /path/to/orb/vocab /path/to/orb/config" << std::endl;
+        return 1;
+    }
+
     Camera zed;
     // Set configuration parameters for the ZED
     InitParameters init_parameters;
     init_parameters.depth_mode = DEPTH_MODE::ULTRA;
     init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed    
+    // parse_args should ignore the ORB slam arguments (only looks for SVO)
     parse_args(argc, argv, init_parameters);
 
     // Open the camera
@@ -59,6 +68,16 @@ int main(int argc, char **argv) {
     }
 
     auto camera_infos = zed.getCameraInformation();
+    std::cout << "ZED SVO Info: \n" <<
+        "\tWidth: " << camera_infos.camera_configuration.resolution.width <<
+        "\tHeight: " << camera_infos.camera_configuration.resolution.height <<
+        "\tFPS: " << camera_infos.camera_configuration.fps << std::endl;
+
+    std::cout << "argc: " << argc << std::endl;
+
+    // Create SLAM system. It initializes all system threads and gets ready to process frames.
+    // vocab should be arg[2] and settings argv[3], this is different than standard ORB SLAM
+    ORB_SLAM3::System SLAM(argv[2],argv[3],ORB_SLAM3::System::STEREO,true);
 
     // Point cloud viewer
     GLViewer viewer;
