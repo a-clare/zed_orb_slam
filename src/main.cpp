@@ -80,32 +80,6 @@ int main(int argc, char **argv) {
     // vocab should be arg[2] and settings argv[3], this is different than standard ORB SLAM
     ORB_SLAM3::System SLAM(argv[2],argv[3],ORB_SLAM3::System::STEREO,true);
 
-    // Setup and start positional tracking
-    Pose pose;
-    POSITIONAL_TRACKING_STATE tracking_state = POSITIONAL_TRACKING_STATE::OFF;
-    PositionalTrackingParameters positional_tracking_parameters;
-    positional_tracking_parameters.enable_area_memory = false;
-    returned_state = zed.enablePositionalTracking(positional_tracking_parameters);
-    if (returned_state != ERROR_CODE::SUCCESS) {
-        print("Enabling positional tracking failed: ", returned_state);
-        zed.close();
-        return EXIT_FAILURE;
-    }
-
-    // Set spatial mapping parameters
-    SpatialMappingParameters spatial_mapping_parameters;
-    // Request a Point Cloud
-    spatial_mapping_parameters.map_type = SpatialMappingParameters::SPATIAL_MAP_TYPE::FUSED_POINT_CLOUD;
-    // Set mapping range, it will set the resolution accordingly (a higher range, a lower resolution)
-    spatial_mapping_parameters.set(SpatialMappingParameters::MAPPING_RANGE::LONG);
-    // Request partial updates only (only the lastest updated chunks need to be re-draw)
-    spatial_mapping_parameters.use_chunk_only = true;
-    // Start the spatial mapping
-    zed.enableSpatialMapping(spatial_mapping_parameters);
-
-    // Timestamp of the last fused point cloud requested
-    chrono::high_resolution_clock::time_point ts_last;
-
     // Setup runtime parameters
     RuntimeParameters runtime_parameters;
     // Use low depth confidence avoid introducing noise in the constructed model
@@ -145,8 +119,14 @@ int main(int argc, char **argv) {
             // Retrieve the images image
             zed.retrieveImage(left_zed_image, VIEW::LEFT);
             zed.retrieveImage(right_zed_image, VIEW::RIGHT);
+            auto timestamp = zed.getTimestamp(sl::TIME_REFERENCE::IMAGE);
+
+            std::cout << "Image " << image_cnt << " at time " << timestamp << std::endl;
             image_cnt += 1;
             std::cout << "Num images: " << image_cnt << std::endl;
+
+            // Send images to ORB slam
+//            SLAM.TrackStereo(left_orb_image, right_orb_image, tframe);
         }
         else if (error == sl::ERROR_CODE::END_OF_SVOFILE_REACHED) {
             std::cout << "Reached end of SVO" << std::endl;
