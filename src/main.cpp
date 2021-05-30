@@ -123,10 +123,9 @@ int main(int argc, char **argv) {
 
             std::cout << "Image " << image_cnt << " at time " << timestamp << std::endl;
             image_cnt += 1;
-            std::cout << "Num images: " << image_cnt << std::endl;
 
             // Send images to ORB slam
-//            SLAM.TrackStereo(left_orb_image, right_orb_image, tframe);
+            SLAM.TrackStereo(left_orb_image, right_orb_image, (double)timestamp / 1e-9);
         }
         else if (error == sl::ERROR_CODE::END_OF_SVOFILE_REACHED) {
             std::cout << "Reached end of SVO" << std::endl;
@@ -137,6 +136,7 @@ int main(int argc, char **argv) {
             std::cout << "Unexpected SVO/ZED error " << error << std::endl;
             end_of_svo = true;
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
     // Free allocated memory before closing the camera
