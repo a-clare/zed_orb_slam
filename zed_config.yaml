@@ -3,6 +3,7 @@
 # Camera Parameters. Adjust them!
 #--------------------------------------------------------------------------------------------
 
+Camera.type: "PinHole"
 # Left Camera calibration and distortion parameters taken from /usr/local/zed/settings
 Camera.fx: 1058.83
 Camera.fy: 1057.84
@@ -13,6 +14,8 @@ Camera.k1: -0.0409334
 Camera.k2: 0.00991803
 Camera.k3: -0.00498366
 Camera.k4: 0.0
+Camera.p1: 0.000300124
+Camera.p2: -0.000132049
 
 Camera2.fx: 1055.43
 Camera2.fy: 1054.73
@@ -23,6 +26,8 @@ Camera2.k1: -0.0412754
 Camera2.k2: 0.00980042
 Camera2.k3: -0.00480904
 Camera2.k4: 0.0
+Camera2.p1: 0.000140455
+Camera2.p2: -0.000964997
 
 # Camera resolution
 Camera.width: 2208
@@ -35,13 +40,14 @@ Camera.fps: 15.0
 Camera.RGB: 1
 
 Camera.bf: 119.836
+ThDepth: 40.0
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
 #--------------------------------------------------------------------------------------------
 
 # ORB Extractor: Number of features per image
-ORBextractor.nFeatures: 1000
+ORBextractor.nFeatures: 2000
 
 # ORB Extractor: Scale factor between levels in the scale pyramid
 ORBextractor.scaleFactor: 1.2
@@ -56,3 +62,14 @@ ORBextractor.nLevels: 8
 # You can lower these values if your images have low contrast
 ORBextractor.iniThFAST: 20
 ORBextractor.minThFAST: 7
+
+Viewer.KeyFrameSize: 0.6
+Viewer.KeyFrameLineWidth: 2
+Viewer.GraphLineWidth: 1
+Viewer.PointSize: 2
+Viewer.CameraSize: 0.7
+Viewer.CameraLineWidth: 3
+Viewer.ViewpointX: 0
+Viewer.ViewpointY: -100
+Viewer.ViewpointZ: -0.1
+Viewer.ViewpointF: 2000
