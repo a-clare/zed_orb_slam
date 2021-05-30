@@ -145,6 +145,7 @@ int main(int argc, char **argv) {
             zed.retrieveImage(left_zed_image, VIEW::LEFT);
             zed.retrieveImage(right_zed_image, VIEW::RIGHT);
             image_cnt += 1;
+            std::cout << "Num images: " << image_cnt << std::endl;
         }
         else if (error == sl::ERROR_CODE::END_OF_SVOFILE_REACHED) {
             std::cout << "Reached end of SVO" << std::endl;
