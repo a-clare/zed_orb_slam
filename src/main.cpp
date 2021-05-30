@@ -79,15 +79,6 @@ int main(int argc, char **argv) {
     // vocab should be arg[2] and settings argv[3], this is different than standard ORB SLAM
     ORB_SLAM3::System SLAM(argv[2],argv[3],ORB_SLAM3::System::STEREO,true);
 
-    // Point cloud viewer
-    GLViewer viewer;
-
-    // Initialize point cloud viewer
-    FusedPointCloud map;
-    GLenum errgl = viewer.init(argc, argv, camera_infos.camera_configuration.calibration_parameters.left_cam, &map, camera_infos.camera_model);
-    if (errgl!=GLEW_OK)
-        print("Error OpenGL: "+std::string((char*)glewGetErrorString(errgl)));
-
     // Setup and start positional tracking
     Pose pose;
     POSITIONAL_TRACKING_STATE tracking_state = POSITIONAL_TRACKING_STATE::OFF;
@@ -119,51 +110,56 @@ int main(int argc, char **argv) {
     // Use low depth confidence avoid introducing noise in the constructed model
     runtime_parameters.confidence_threshold = 50;
 
-    auto resolution = camera_infos.camera_configuration.resolution;
+    auto camera_resolution = camera_infos.camera_configuration.resolution;
 
-    // Define display resolution and check that it fit at least the image resolution
-    Resolution display_resolution(min((int)resolution.width, 720), min((int)resolution.height, 404));
+    // Allocate the memory/images for ZED and ORB (OpenCV)
+    sl::Mat left_zed_image(camera_resolution, sl::MAT_TYPE::U8_C4);
+    sl::Mat right_zed_image(camera_resolution, sl::MAT_TYPE::U8_C4);
 
-    // Create a Mat to contain the left image and its opencv ref
-    Mat image_zed(display_resolution, MAT_TYPE::U8_C4);
-    cv::Mat image_zed_ocv(image_zed.getHeight(), image_zed.getWidth(), CV_8UC4, image_zed.getPtr<sl::uchar1>(MEM::CPU));
+    // If you download or have used zed-examples from github, there is an example
+    // called svo_recording/export. There is a function in there called slMat2cvMat,
+    // this is where the logic/code to convert ZED -> OpenCV was taken from
+    cv::Mat left_orb_image(
+            left_zed_image.getHeight(),
+            left_zed_image.getWidth(),
+            CV_8UC4,
+            left_zed_image.getPtr<sl::uchar1>(sl::MEM::CPU));
+    cv::Mat right_orb_image(
+            right_zed_image.getHeight(),
+            right_zed_image.getWidth(),
+            CV_8UC4,
+            right_zed_image.getPtr<sl::uchar1>(sl::MEM::CPU));
 
-    // Start the main loop
-    while (viewer.isAvailable()) {
-        // Grab a new image
-        if (zed.grab(runtime_parameters) == ERROR_CODE::SUCCESS) {
-            // Retrieve the left image
-            zed.retrieveImage(image_zed, VIEW::LEFT, MEM::CPU, display_resolution);
-            // Retrieve the camera pose data
-            tracking_state = zed.getPosition(pose);
-            viewer.updatePose(pose, tracking_state);
+    // Going to keep procesing until we reach the end of the SVO file
+    bool end_of_svo = false;
 
-            if (tracking_state == POSITIONAL_TRACKING_STATE::OK) {
-                auto duration = chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now() - ts_last).count();
+    // Simple counter for number of images retreived. Used for debugging
+    std::uint32_t image_cnt = 0;
 
-                // Ask for a fused point cloud update if 500ms have elapsed since last request
-                if((duration > 500) && viewer.chunksUpdated()) {
-                    // Ask for a point cloud refresh
-                    zed.requestSpatialMapAsync();
-                    ts_last = chrono::high_resolution_clock::now();
-                }
+    while (!end_of_svo) {
+        // Try and grab a new image
+        sl::ERROR_CODE error = zed.grab(runtime_parameters);
 
-                // If the point cloud is ready to be retrieved
-                if(zed.getSpatialMapRequestStatusAsync() == ERROR_CODE::SUCCESS) {
-                    zed.retrieveSpatialMapAsync(map);
-                    viewer.updateChunks();
-                }
-            }
-            cv::imshow("ZED View", image_zed_ocv);
-            cv::waitKey(15);
+        if (error == ERROR_CODE::SUCCESS) {
+            // Retrieve the images image
+            zed.retrieveImage(left_zed_image, VIEW::LEFT);
+            zed.retrieveImage(right_zed_image, VIEW::RIGHT);
+            image_cnt += 1;
+        }
+        else if (error == sl::ERROR_CODE::END_OF_SVOFILE_REACHED) {
+            std::cout << "Reached end of SVO" << std::endl;
+            std::cout << "Num images: " << image_cnt << std::endl;
+            end_of_svo = true;
+        }
+        else {
+            std::cout << "Unexpected SVO/ZED error " << error << std::endl;
+            end_of_svo = true;
         }
     }
 
-    // Save generated point cloud
-    //map.save("MyFusedPointCloud");
-
     // Free allocated memory before closing the camera
-    image_zed.free();
+    left_zed_image.free();
+    right_zed_image.free();
     // Close the ZED
     zed.close();
 
