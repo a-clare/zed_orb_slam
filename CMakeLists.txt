@@ -63,10 +63,14 @@ else()
     SET(ZED_LIBS ${ZED_STATIC_LIBRARIES} ${CUDA_CUDA_LIBRARY} ${CUDA_LIBRARY})
 endif()
 
+include_directories(ORB_SLAM3/include)
+include_directories(ORB_SLAM3)
+include_directories(ORB_SLAM3/include/CameraModels)
 TARGET_LINK_LIBRARIES(${PROJECT_NAME}
         ${SPECIAL_OS_LIBS}
         ${ZED_LIBS}
         ${OpenCV_LIBRARIES}
         ${OPENGL_LIBRARIES}
         ${GLUT_LIBRARY}
-        ${GLEW_LIBRARIES})
+        ${GLEW_LIBRARIES}
+        ORB_SLAM3)

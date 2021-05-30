@@ -31,6 +31,8 @@
 
 #include <opencv2/opencv.hpp>
 
+#include<System.h>
+
 // Using std and sl namespaces
 using namespace std;
 using namespace sl;
